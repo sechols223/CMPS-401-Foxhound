@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type Task struct {
-	gorm.Model
+	ID    uint   `json:"id" gorm:"primary_key"`
 	Title string `json:"title"`
 	Done  bool   `json:"done"`
 }

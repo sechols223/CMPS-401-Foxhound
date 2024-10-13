@@ -8,7 +8,7 @@ import (
 )
 
 func ConnectToDatabase() (*gorm.DB, error) {
-	database, err := gorm.Open(mysql.Open("./database.db"), &gorm.Config{})
+	database, err := gorm.Open(mysql.Open("root:admin@tcp(127.0.0.1:3306)/task_management"), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err.Error())

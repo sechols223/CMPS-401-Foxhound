@@ -10,7 +10,6 @@ import (
 
 type NewTask struct {
 	Title string `json:"title" binding:"required"`
-	Done  bool   `json:"done" binding:"required"`
 }
 
 type TaskUpdate struct {
@@ -55,7 +54,7 @@ func PostTask(context *gin.Context) {
 		return
 	}
 
-	newTask := models.Task{Title: task.Title, Done: task.Done}
+	newTask := models.Task{Title: task.Title}
 
 	db, err := models.ConnectToDatabase()
 	if err != nil {
