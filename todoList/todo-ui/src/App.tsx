@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import "@mantine/core/styles.css";
-import { Loader, Flex, MantineProvider } from "@mantine/core";
+import {
+  Loader,
+  Button,
+  MantineProvider,
+  Table,
+  Container,
+} from "@mantine/core";
 
 interface Task {
-  ID: number;
+  ID: number; //having this as id does not work gorm is defining it as ID and it will not recognize it for some reason
   title: string;
   done: boolean;
 }
@@ -58,13 +64,26 @@ function App() {
   return (
     <MantineProvider forceColorScheme="dark">
       {tasks ? (
-        <Flex justify="center">
-          <h1>{tasks[0].title}</h1>
-        </Flex>
+        <Container>
+          <Table striped withColumnBorders withTableBorder>
+            {tasks.map((task) => {
+              return (
+                <Table.Tr key={task.ID}>
+                  <Table.Td>
+                    <Button color="green">Complete</Button>
+                  </Table.Td>
+                  <Table.Td>{task.title}</Table.Td>
+                  <Table.Td>
+                    <Button color="red">Delete</Button>
+                  </Table.Td>
+                </Table.Tr>
+              );
+            })}
+          </Table>
+        </Container>
       ) : (
         <div
           style={{
-            height: "100%",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
