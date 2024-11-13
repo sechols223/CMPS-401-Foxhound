@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import "@mantine/core/styles.css";
+import { Loader, Flex, MantineProvider } from "@mantine/core";
 
 interface Task {
   ID: number;
@@ -15,7 +14,6 @@ interface TaskDto {
 }
 
 function App() {
-  const [count, setCount] = useState(0);
   const [tasks, setTasks] = useState<Task[]>();
 
   const fetchTasks = async () => {
@@ -23,12 +21,6 @@ function App() {
     const data = await response.json();
     setTasks(data);
   };
-
-  async function fetchTask(id: number): Promise<Task> {
-    const response = await fetch(`http://localhost:8080/tasks/${id}`);
-    const data = await response.json();
-    return data;
-  }
 
   async function editTask(id: number, task: TaskDto) {
     const response = await fetch(`http://localhost:8080/tasks/${id}`, {
@@ -64,45 +56,24 @@ function App() {
   }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Test this bomb ass Vite + React setup please!</h1>
-      <div className="card">
-        <button
-          onClick={() => createTask({ title: "this worked", done: false })}
+    <MantineProvider forceColorScheme="dark">
+      {tasks ? (
+        <Flex justify="center">
+          <h1>{tasks[0].title}</h1>
+        </Flex>
+      ) : (
+        <div
+          style={{
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
         >
-          muh fuckin' count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <div>
-        {tasks ? (
-          tasks.map((task) => {
-            return (
-              <div key={task.ID}>
-                <h2>
-                  Task: {task.ID} {task.title}
-                </h2>
-              </div>
-            );
-          })
-        ) : (
-          <></>
-        )}
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+          <Loader />
+        </div>
+      )}
+    </MantineProvider>
   );
 }
 
