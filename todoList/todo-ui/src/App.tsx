@@ -6,7 +6,9 @@ import {
   MantineProvider,
   Table,
   Container,
+  Text,
 } from "@mantine/core";
+import { ModalsProvider, openConfirmModal } from "@mantine/modals";
 
 interface Task {
   ID: number; //having this as id does not work gorm is defining it as ID and it will not recognize it for some reason
@@ -21,6 +23,20 @@ interface TaskDto {
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>();
+
+  const openDeleteModal = (taskId: number) => {
+    openConfirmModal({
+      title: "Delete Task?",
+      children: (
+        <Text size="sm">Are you sure you want to delete this task?</Text>
+      ),
+      labels: { cancel: "Cancel", confirm: "Delete" },
+      confirmProps: { color: "red" },
+      cancelProps: { color: "blue", variant: "outline" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => deleteTask(taskId),
+    });
+  };
 
   const fetchTasks = async () => {
     const response = await fetch("http://localhost:8080/tasks");
@@ -65,23 +81,31 @@ function App() {
     <MantineProvider forceColorScheme="dark">
       {tasks ? (
         <Container>
-          <Table striped withColumnBorders withTableBorder>
-            {tasks.map((task) => {
-              return (
-                <Table.Tr key={task.ID}>
-                  <Table.Td>
-                    <Button color="green">Complete</Button>
-                  </Table.Td>
-                  <Table.Td>{task.title}</Table.Td>
-                  <Table.Td>
-                    <Button onClick={() => deleteTask(task.ID)} color="red">
-                      Delete
-                    </Button>
-                  </Table.Td>
-                </Table.Tr>
-              );
-            })}
-          </Table>
+          <ModalsProvider>
+            <Button onClick={() => createTask({ title: "test", done: false })}>
+              Create (remove later)
+            </Button>
+            <Table striped withColumnBorders withTableBorder>
+              {tasks.map((task) => {
+                return (
+                  <Table.Tr key={task.ID}>
+                    <Table.Td>
+                      <Button color="green">Complete</Button>
+                    </Table.Td>
+                    <Table.Td>{task.title}</Table.Td>
+                    <Table.Td>
+                      <Button
+                        onClick={() => openDeleteModal(task.ID)}
+                        color="red"
+                      >
+                        Delete
+                      </Button>
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })}
+            </Table>
+          </ModalsProvider>
         </Container>
       ) : (
         <div
