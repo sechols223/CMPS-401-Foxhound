@@ -7,8 +7,12 @@ import {
   Table,
   Container,
   Text,
+  TextInput,
+  Modal,
+  Space,
 } from "@mantine/core";
 import { ModalsProvider, openConfirmModal } from "@mantine/modals";
+import { useForm } from "@mantine/form";
 
 interface Task {
   ID: number; //having this as id does not work gorm is defining it as ID and it will not recognize it for some reason
@@ -23,6 +27,20 @@ interface TaskDto {
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>();
+  const [editRow, setEditRow] = useState(false);
+  const [editTaskId, setEditTaskId] = useState(0);
+
+  const editButton = (id: number) => {
+    setEditTaskId(id);
+    setEditRow(!editRow);
+  };
+
+  const mantineForm = useForm<TaskDto>({
+    initialValues: {
+      title: "",
+      done: false,
+    },
+  });
 
   const openDeleteModal = (taskId: number) => {
     openConfirmModal({
@@ -44,15 +62,16 @@ function App() {
     setTasks(data);
   };
 
-  async function editTask(id: number, task: TaskDto) {
-    const response = await fetch(`http://localhost:8080/tasks/${id}`, {
+  const editTask = async (task: TaskDto) => {
+    const response = await fetch(`http://localhost:8080/tasks/${editTaskId}`, {
       method: "PATCH",
       body: JSON.stringify(task),
     });
     if (response.ok) {
+      setEditRow(!editRow);
       await fetchTasks();
     }
-  }
+  };
 
   const createTask = async (task: TaskDto) => {
     const response = await fetch("http://localhost:8080/tasks", {
@@ -92,7 +111,22 @@ function App() {
                     <Table.Td>
                       <Button color="green">Complete</Button>
                     </Table.Td>
-                    <Table.Td>{task.title}</Table.Td>
+
+                    <Table.Td>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        {task.title}
+                        <Button onClick={() => editButton(task.ID)}>
+                          Edit
+                        </Button>
+                      </div>
+                    </Table.Td>
+
                     <Table.Td>
                       <Button
                         onClick={() => openDeleteModal(task.ID)}
@@ -101,6 +135,40 @@ function App() {
                         Delete
                       </Button>
                     </Table.Td>
+                    <Modal
+                      opened={editRow}
+                      onClose={() => {
+                        setEditRow(!editRow);
+                      }}
+                      title="Edit Task"
+                      centered
+                    >
+                      <form onSubmit={mantineForm.onSubmit(editTask)}>
+                        <div>
+                          <TextInput
+                            {...mantineForm.getInputProps("title")}
+                            placeholder={task.title}
+                            label="task"
+                            withAsterisk
+                          />
+                        </div>
+                        <Space h={18} />
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Button
+                            onClick={() => setEditRow(!editRow)}
+                            variant="outline"
+                          >
+                            Cancel
+                          </Button>
+                          <Button type="submit">Submit</Button>
+                        </div>
+                      </form>
+                    </Modal>
                   </Table.Tr>
                 );
               })}
