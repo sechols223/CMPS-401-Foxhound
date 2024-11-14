@@ -74,7 +74,9 @@ function App() {
                   </Table.Td>
                   <Table.Td>{task.title}</Table.Td>
                   <Table.Td>
-                    <Button color="red">Delete</Button>
+                    <Button onClick={() => deleteTask(task.ID)} color="red">
+                      Delete
+                    </Button>
                   </Table.Td>
                 </Table.Tr>
               );
