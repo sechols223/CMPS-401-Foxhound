@@ -26,6 +26,7 @@ interface TaskDto {
 
 function App() {
   const [editRow, setEditRow] = useState(false);
+  const [createToggle, setCreateToggle] = useState(false);
   const [editTaskId, setEditTaskId] = useState(0);
 
   const [incompleteTasks, setIncompleteTasks] = useState<Task[]>();
@@ -34,6 +35,10 @@ function App() {
   const editButton = (id: number) => {
     setEditTaskId(id);
     setEditRow(!editRow);
+  };
+
+  const createButton = () => {
+    setCreateToggle(!createToggle);
   };
 
   const mantineForm = useForm<TaskDto>({
@@ -93,6 +98,7 @@ function App() {
       body: JSON.stringify(task),
     });
     if (response.ok) {
+      createButton();
       await fetchTasks();
     }
   };
@@ -115,9 +121,56 @@ function App() {
       <>
         {incompleteTasks ? (
           <ModalsProvider>
-            <Button onClick={() => createTask({ title: "test", done: false })}>
-              Create (remove later)
-            </Button>
+            <h1 style={{ display: "flex", justifyContent: "center" }}>
+              Go Do It
+            </h1>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <Button onClick={() => createButton()}>Create Task</Button>
+            </div>
+
+            <Modal
+              opened={createToggle}
+              onClose={() => {
+                createButton();
+              }}
+              title="Edit Task"
+              centered
+            >
+              <form onSubmit={mantineForm.onSubmit(createTask)}>
+                <div>
+                  <TextInput
+                    {...mantineForm.getInputProps("title")}
+                    label="task"
+                    withAsterisk
+                  />
+                </div>
+                <Space h={18} />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Button onClick={() => createButton()} variant="outline">
+                    Cancel
+                  </Button>
+                  <Button type="submit">Submit</Button>
+                </div>
+              </form>
+            </Modal>
+
+            <Space h={18} />
+
+            <div style={{ display: "flex", justifyContent: "space-around" }}>
+              <h2>Incomplete</h2>
+              <h2>Complete</h2>
+            </div>
+
             <div style={{ display: "flex", justifyContent: "space-around" }}>
               <div style={{ width: "45%" }}>
                 <Table striped withColumnBorders withTableBorder>
