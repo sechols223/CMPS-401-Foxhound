@@ -121,104 +121,108 @@ function App() {
             <div style={{ display: "flex", justifyContent: "space-around" }}>
               <div style={{ width: "45%" }}>
                 <Table striped withColumnBorders withTableBorder>
-                  {incompleteTasks?.map((task) => {
-                    return (
-                      <Table.Tr key={task.ID}>
-                        <Table.Td>
-                          <Button
-                            color="green"
-                            onClick={() => toggleComplete(task)}
-                          >
-                            Complete
-                          </Button>
-                        </Table.Td>
-
-                        <Table.Td>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            {task.title}
-                            <Button onClick={() => editButton(task.ID)}>
-                              Edit
+                  <Table.Tbody>
+                    {incompleteTasks?.map((task) => {
+                      return (
+                        <Table.Tr key={task.ID}>
+                          <Table.Td>
+                            <Button
+                              color="green"
+                              onClick={() => toggleComplete(task)}
+                            >
+                              Complete
                             </Button>
-                          </div>
-                        </Table.Td>
+                          </Table.Td>
 
-                        <Table.Td>
-                          <Button
-                            onClick={() => openDeleteModal(task.ID)}
-                            color="red"
-                          >
-                            Delete
-                          </Button>
-                        </Table.Td>
-
-                        <Modal
-                          opened={editRow}
-                          onClose={() => {
-                            setEditRow(!editRow);
-                          }}
-                          title="Edit Task"
-                          centered
-                        >
-                          <form onSubmit={mantineForm.onSubmit(editTask)}>
-                            <div>
-                              <TextInput
-                                {...mantineForm.getInputProps("title")}
-                                placeholder={task.title}
-                                label="task"
-                                withAsterisk
-                              />
-                            </div>
-                            <Space h={18} />
+                          <Table.Td>
                             <div
                               style={{
                                 display: "flex",
                                 justifyContent: "space-between",
+                                alignItems: "center",
                               }}
                             >
-                              <Button
-                                onClick={() => setEditRow(!editRow)}
-                                variant="outline"
-                              >
-                                Cancel
+                              {task.title}
+                              <Button onClick={() => editButton(task.ID)}>
+                                Edit
                               </Button>
-                              <Button type="submit">Submit</Button>
                             </div>
-                          </form>
-                        </Modal>
-                      </Table.Tr>
-                    );
-                  })}
+                          </Table.Td>
+
+                          <Table.Td>
+                            <Button
+                              onClick={() => openDeleteModal(task.ID)}
+                              color="red"
+                            >
+                              Delete
+                            </Button>
+                          </Table.Td>
+
+                          <Modal
+                            opened={editRow}
+                            onClose={() => {
+                              setEditRow(!editRow);
+                            }}
+                            title="Edit Task"
+                            centered
+                          >
+                            <form onSubmit={mantineForm.onSubmit(editTask)}>
+                              <div>
+                                <TextInput
+                                  {...mantineForm.getInputProps("title")}
+                                  placeholder={task.title}
+                                  label="task"
+                                  withAsterisk
+                                />
+                              </div>
+                              <Space h={18} />
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                }}
+                              >
+                                <Button
+                                  onClick={() => setEditRow(!editRow)}
+                                  variant="outline"
+                                >
+                                  Cancel
+                                </Button>
+                                <Button type="submit">Submit</Button>
+                              </div>
+                            </form>
+                          </Modal>
+                        </Table.Tr>
+                      );
+                    })}
+                  </Table.Tbody>
                 </Table>
               </div>
               <div style={{ width: "45%" }}>
                 <Table withColumnBorders withTableBorder striped width={200}>
-                  {completeTasks?.map((task) => {
-                    return (
-                      <Table.Tr key={task.ID}>
-                        <Table.Td>
-                          <Button onClick={() => toggleComplete(task)}>
-                            Return
-                          </Button>
-                        </Table.Td>
-                        <Table.Td>{task.title}</Table.Td>
+                  <Table.Tbody>
+                    {completeTasks?.map((task) => {
+                      return (
+                        <Table.Tr key={task.ID}>
+                          <Table.Td>
+                            <Button onClick={() => toggleComplete(task)}>
+                              Return
+                            </Button>
+                          </Table.Td>
+                          <Table.Td>{task.title}</Table.Td>
 
-                        <Table.Td>
-                          <Button
-                            onClick={() => openDeleteModal(task.ID)}
-                            color="red"
-                          >
-                            Delete
-                          </Button>
-                        </Table.Td>
-                      </Table.Tr>
-                    );
-                  })}
+                          <Table.Td>
+                            <Button
+                              onClick={() => openDeleteModal(task.ID)}
+                              color="red"
+                            >
+                              Delete
+                            </Button>
+                          </Table.Td>
+                        </Table.Tr>
+                      );
+                    })}
+                  </Table.Tbody>
                 </Table>
               </div>
             </div>
