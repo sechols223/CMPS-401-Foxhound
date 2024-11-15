@@ -5,7 +5,6 @@ import {
   Button,
   MantineProvider,
   Table,
-  Container,
   Text,
   TextInput,
   Modal,
@@ -26,9 +25,11 @@ interface TaskDto {
 }
 
 function App() {
-  const [tasks, setTasks] = useState<Task[]>();
   const [editRow, setEditRow] = useState(false);
   const [editTaskId, setEditTaskId] = useState(0);
+
+  const [incompleteTasks, setIncompleteTasks] = useState<Task[]>();
+  const [completeTasks, setCompleteTasks] = useState<Task[]>();
 
   const editButton = (id: number) => {
     setEditTaskId(id);
@@ -59,7 +60,9 @@ function App() {
   const fetchTasks = async () => {
     const response = await fetch("http://localhost:8080/tasks");
     const data = await response.json();
-    setTasks(data);
+    //setTasks(data);
+    setIncompleteTasks(data.filter((task: Task) => !task.done));
+    setCompleteTasks(data.filter((task: Task) => task.done));
   };
 
   const editTask = async (task: TaskDto) => {
@@ -69,6 +72,17 @@ function App() {
     });
     if (response.ok) {
       setEditRow(!editRow);
+      await fetchTasks();
+    }
+  };
+
+  const toggleComplete = async (task: Task) => {
+    task.done = !task.done;
+    const response = await fetch(`http://localhost:8080/tasks/${task.ID}`, {
+      method: "PATCH",
+      body: JSON.stringify(task),
+    });
+    if (response.ok) {
       await fetchTasks();
     }
   };
@@ -98,94 +112,129 @@ function App() {
 
   return (
     <MantineProvider forceColorScheme="dark">
-      {tasks ? (
-        <Container>
+      <>
+        {incompleteTasks ? (
           <ModalsProvider>
             <Button onClick={() => createTask({ title: "test", done: false })}>
               Create (remove later)
             </Button>
-            <Table striped withColumnBorders withTableBorder>
-              {tasks.map((task) => {
-                return (
-                  <Table.Tr key={task.ID}>
-                    <Table.Td>
-                      <Button color="green">Complete</Button>
-                    </Table.Td>
-
-                    <Table.Td>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        {task.title}
-                        <Button onClick={() => editButton(task.ID)}>
-                          Edit
-                        </Button>
-                      </div>
-                    </Table.Td>
-
-                    <Table.Td>
-                      <Button
-                        onClick={() => openDeleteModal(task.ID)}
-                        color="red"
-                      >
-                        Delete
-                      </Button>
-                    </Table.Td>
-                    <Modal
-                      opened={editRow}
-                      onClose={() => {
-                        setEditRow(!editRow);
-                      }}
-                      title="Edit Task"
-                      centered
-                    >
-                      <form onSubmit={mantineForm.onSubmit(editTask)}>
-                        <div>
-                          <TextInput
-                            {...mantineForm.getInputProps("title")}
-                            placeholder={task.title}
-                            label="task"
-                            withAsterisk
-                          />
-                        </div>
-                        <Space h={18} />
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
-                        >
+            <div style={{ display: "flex", justifyContent: "space-around" }}>
+              <div style={{ width: "45%" }}>
+                <Table striped withColumnBorders withTableBorder>
+                  {incompleteTasks?.map((task) => {
+                    return (
+                      <Table.Tr key={task.ID}>
+                        <Table.Td>
                           <Button
-                            onClick={() => setEditRow(!editRow)}
-                            variant="outline"
+                            color="green"
+                            onClick={() => toggleComplete(task)}
                           >
-                            Cancel
+                            Complete
                           </Button>
-                          <Button type="submit">Submit</Button>
-                        </div>
-                      </form>
-                    </Modal>
-                  </Table.Tr>
-                );
-              })}
-            </Table>
+                        </Table.Td>
+
+                        <Table.Td>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            {task.title}
+                            <Button onClick={() => editButton(task.ID)}>
+                              Edit
+                            </Button>
+                          </div>
+                        </Table.Td>
+
+                        <Table.Td>
+                          <Button
+                            onClick={() => openDeleteModal(task.ID)}
+                            color="red"
+                          >
+                            Delete
+                          </Button>
+                        </Table.Td>
+
+                        <Modal
+                          opened={editRow}
+                          onClose={() => {
+                            setEditRow(!editRow);
+                          }}
+                          title="Edit Task"
+                          centered
+                        >
+                          <form onSubmit={mantineForm.onSubmit(editTask)}>
+                            <div>
+                              <TextInput
+                                {...mantineForm.getInputProps("title")}
+                                placeholder={task.title}
+                                label="task"
+                                withAsterisk
+                              />
+                            </div>
+                            <Space h={18} />
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Button
+                                onClick={() => setEditRow(!editRow)}
+                                variant="outline"
+                              >
+                                Cancel
+                              </Button>
+                              <Button type="submit">Submit</Button>
+                            </div>
+                          </form>
+                        </Modal>
+                      </Table.Tr>
+                    );
+                  })}
+                </Table>
+              </div>
+              <div style={{ width: "45%" }}>
+                <Table withColumnBorders withTableBorder striped width={200}>
+                  {completeTasks?.map((task) => {
+                    return (
+                      <Table.Tr key={task.ID}>
+                        <Table.Td>
+                          <Button onClick={() => toggleComplete(task)}>
+                            Return
+                          </Button>
+                        </Table.Td>
+                        <Table.Td>{task.title}</Table.Td>
+
+                        <Table.Td>
+                          <Button
+                            onClick={() => openDeleteModal(task.ID)}
+                            color="red"
+                          >
+                            Delete
+                          </Button>
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })}
+                </Table>
+              </div>
+            </div>
           </ModalsProvider>
-        </Container>
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Loader />
-        </div>
-      )}
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Loader />
+          </div>
+        )}
+      </>
     </MantineProvider>
   );
 }
