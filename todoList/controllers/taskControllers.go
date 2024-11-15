@@ -91,8 +91,10 @@ func UpdateTask(context *gin.Context) {
 		return
 	}
 
-	if err := db.Model(&task).Updates(models.Task{Title: updatedTask.Title, Done: updatedTask.Done}).Error; err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if err := db.Model(&task).Updates(map[string]interface{}{
+		"title": 	updatedTask.Title, 
+		"done": 	updatedTask.Done}).Error; err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	context.IndentedJSON(http.StatusOK, task)
