@@ -9,6 +9,9 @@ import {
   TextInput,
   Modal,
   Space,
+  Container,
+  ActionIcon,
+  Flex,
 } from "@mantine/core";
 import { ModalsProvider, openConfirmModal } from "@mantine/modals";
 import { useForm } from "@mantine/form";
@@ -173,18 +176,23 @@ function App() {
 
             <div style={{ display: "flex", justifyContent: "space-around" }}>
               <div style={{ width: "45%" }}>
-                <Table striped withColumnBorders withTableBorder>
+                <Table>
                   <Table.Tbody>
                     {incompleteTasks?.map((task) => {
                       return (
                         <Table.Tr key={task.ID}>
                           <Table.Td>
-                            <Button
-                              color="green"
-                              onClick={() => toggleComplete(task)}
+                            <Flex
+                              justify="flex-end"
+                              direction="row"
+                              wrap="wrap"
                             >
-                              Complete
-                            </Button>
+                              <ActionIcon
+                                aria-label="box"
+                                variant="outline"
+                                onClick={() => toggleComplete(task)}
+                              ></ActionIcon>
+                            </Flex>
                           </Table.Td>
 
                           <Table.Td>
