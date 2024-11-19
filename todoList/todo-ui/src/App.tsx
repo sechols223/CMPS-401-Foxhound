@@ -9,7 +9,6 @@ import {
   TextInput,
   Modal,
   Space,
-  Container,
   ActionIcon,
   Flex,
 } from "@mantine/core";
@@ -141,7 +140,7 @@ function App() {
               onClose={() => {
                 createButton();
               }}
-              title="Edit Task"
+              title="Create Task"
               centered
             >
               <form onSubmit={mantineForm.onSubmit(createTask)}>
